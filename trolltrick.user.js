@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         TrollTrick
-// @version      1.0.0
+// @version      1.0.1
 // @description  Removes ignored users' forum posts instead of collapsing them
 // @author       Toni Peric
 // @match        https://*.hattrick.org/Forum/*
-// @icon         https://i.imgur.com/Mc6R0gO.png
+// @icon         https://raw.githubusercontent.com/toniperic/trolltrick/master/icon.png
 // @grant        GM_getValue
 // @grant        GM_setValue
 // ==/UserScript==
