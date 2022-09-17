@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         TrollTrick
-// @version      1.0.1
+// @version      1.1.0
 // @description  Removes ignored users' forum posts instead of collapsing them
 // @author       Toni Peric
-// @match        https://*.hattrick.org/Forum/*
+// @match        https://*.hattrick.org/*
 // @icon         https://raw.githubusercontent.com/toniperic/trolltrick/master/icon.png
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -120,3 +120,38 @@ function getIgnoreList()
     });
 })();
 
+// attach observer that removes messages from chat
+new MutationObserver(function (events, observer) {
+    events = events.filter(event => event.addedNodes.length !== 0);
+
+    if (events.length === 0) return;
+
+    events.forEach(function (event) {
+        event.addedNodes.forEach(function (node) {
+            if (node.localName !== 'ht-chat') return;
+
+            new MutationObserver(function (events) {
+                events = events.filter(event => event.addedNodes.length !== 0 && event.target.localName === 'div' && event.target.classList.contains('chat-bubble-content'));
+
+                if (! events) return;
+
+                events.forEach(function (event) {
+                    let anchor = event.target.querySelector('a[href^="/Club/Manager/"]');
+
+                    if (! anchor) return;
+
+                    let messageAuthorId = new URL(anchor.href).searchParams.get('userId') || false;
+
+                    let ignoreList = getIgnoreList();
+
+                    if (ignoreList.includes(messageAuthorId)) {
+                        anchor.closest('ht-chat-message').remove();
+                    }
+                });
+            }).observe(node, { subtree: true, childList: true });
+
+            observer.disconnect();
+        });
+    });
+
+}).observe(document, { subtree: true, childList: true });
